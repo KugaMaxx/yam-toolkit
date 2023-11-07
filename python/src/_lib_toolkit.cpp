@@ -213,7 +213,8 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("xs", &kit::EventStorage::xs)
 		.def("ys", &kit::EventStorage::ys)
 		.def("coordinates", &kit::EventStorage::coordinates)
-		.def("polarities", &kit::EventStorage::polarities);
+		.def("polarities", &kit::EventStorage::polarities)
+		.def("toEventStore", &kit::EventStorage::toEventStore);
 
     py::class_<kit::FrameStorage>(m, "FrameStorage")
         .def(py::init<>())
