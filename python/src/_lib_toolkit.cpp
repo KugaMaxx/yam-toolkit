@@ -410,7 +410,48 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("frames", &kit::MonoCameraData::frames)
 		.def("imus", &kit::MonoCameraData::imus)
 		.def("triggers", &kit::MonoCameraData::triggers);
-		
+
+	py::class_<kit::CustomizedCameraData>(m, "CustomizedCameraData")
+		.def(py::init<>())
+		.def("__getitem__", &kit::CustomizedCameraData::get, py::return_value_policy::reference)
+		.def("__setitem__", &kit::CustomizedCameraData::set)
+		.def("get", &kit::CustomizedCameraData::get, py::return_value_policy::reference)
+		.def("set", &kit::CustomizedCameraData::set)
+		.def("add",
+			 [](kit::CustomizedCameraData &self, const kit::CustomizedCameraData &other) {
+				return self.add(other);
+			 }, "other"_a)
+		.def("add",
+			 [](kit::CustomizedCameraData &self, const std::string &name, const kit::CustomizedCameraData::UnifiedType &store) {
+				return self.add(name, store);
+			 }, "name"_a, "store"_a)
+		.def("sliceByNumber",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const size_t start) {
+				return self.sliceByNumber(name, start);
+			 }, "name"_a, "start"_a)
+		.def("sliceByNumber",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const size_t start, const size_t length) {
+				return self.sliceByNumber(name, start, length);
+			 }, "name"_a, "start"_a, "length"_a)
+		.def("sliceByNumber",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const size_t start) {
+				return self.sliceByNumber(name, start);
+			 }, "name"_a, "start"_a)
+		.def("sliceByNumber",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const size_t start, const size_t length) {
+				return self.sliceByNumber(name, start, length);
+			 }, "name"_a, "start"_a, "length"_a)
+		.def("sliceByTime",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const int64_t start) {
+				return self.sliceByTime(name, start);
+			 }, "name"_a, "start"_a)
+		.def("sliceByTime",
+			 [](const kit::CustomizedCameraData &self, const std::string &name, const int64_t start, const int64_t end) {
+				return self.sliceByTime(name, start, end);
+			 }, "name"_a, "start"_a, "end"_a)
+		.def("size", &kit::CustomizedCameraData::size)
+		.def("timeWindow", &kit::CustomizedCameraData::timeWindow);
+
 	py::class_<kit::MonoCameraSlicer>(m, "MonoCameraSlicer")
 		.def(py::init<>())
 		.def("accept", &kit::MonoCameraSlicer::accept)

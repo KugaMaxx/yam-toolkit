@@ -145,6 +145,11 @@ public:
     }
 };
 
+class CustomizedCameraData : public StandardCameraData<CustomizedCameraData> {
+public:
+    CustomizedCameraData() = default;
+};
+
 class StereoCameraData : public std::unordered_map<std::string, MonoCameraData> {
 public:
     StereoCameraData() : std::unordered_map<std::string, MonoCameraData>() {
