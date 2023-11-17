@@ -45,9 +45,9 @@ private:
             }
         }
         
-        if (eventReader.getEventResolution().has_value()) {
-            mResolution = *eventReader.getEventResolution();
-        }
+        mEventResolution = eventReader.getEventResolution();
+        mFrameResolution = frameReader.getFrameResolution();
+
         return data;
     }
 
@@ -63,13 +63,15 @@ private:
 
     fs::path mFilePath;
     fs::path mFileExtension;
-    cv::Size mResolution;
+    std::optional<cv::Size> mEventResolution;
+    std::optional<cv::Size> mFrameResolution;
 
 public:
     MonoCameraReader(const fs::path &path) :
         mFilePath(path),
         mFileExtension(path.extension()),
-        mResolution(cv::Size(0, 0)) {
+        mEventResolution(std::nullopt),
+        mFrameResolution(std::nullopt) {
     }
 
     MonoCameraData loadData() {
@@ -82,8 +84,19 @@ public:
 		} 
     }
 
-    [[nodiscard]] std::optional<cv::Size> getResolution() const {
-        return mResolution;
+    [[nodiscard]] std::optional<cv::Size> getResolution(const std::string &name) const {
+        if (name == "frame") {
+            return mFrameResolution;
+        }
+        return mEventResolution;
+	}
+
+    [[nodiscard]] std::optional<cv::Size> getEventResolution() const {
+        return mEventResolution;
+	}
+
+    [[nodiscard]] std::optional<cv::Size> getFrameResolution() const {
+        return mFrameResolution;
 	}
 };
 

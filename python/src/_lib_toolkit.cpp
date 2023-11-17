@@ -485,7 +485,9 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 	py::class_<kit::io::MonoCameraReader>(m_io, "MonoCameraReader")
 		.def(py::init<const fs::path &>())
 		.def("loadData", &kit::io::MonoCameraReader::loadData)
-		.def("getResolution", &kit::io::MonoCameraReader::getResolution);
+		.def("getResolution", &kit::io::MonoCameraReader::getResolution)
+		.def("getEventResolution", &kit::io::MonoCameraReader::getEventResolution)
+		.def("getFrameResolution", &kit::io::MonoCameraReader::getFrameResolution);
 
 	py::class_<kit::io::MonoCameraWriter>(m_io, "MonoCameraWriter")
 		.def(py::init<const fs::path &, const cv::Size &>())
