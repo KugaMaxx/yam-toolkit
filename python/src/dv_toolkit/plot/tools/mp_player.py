@@ -185,7 +185,7 @@ class Preset(object):
         """
         Create a Figure() class with default settings
         """
-        self._size = size[::-1]
+        self._size = size
         self._packets = packets
         self._ticks = range(len(packets))
 
@@ -196,8 +196,8 @@ class Preset(object):
 
     # ---------------- 2d settings ----------------
     def set_2d_plot(self, ax, **kwargs):
-        ax.set_xlim(0, self._size[1])
-        ax.set_ylim(0, self._size[0])
+        ax.set_xlim(0, self._size[0])
+        ax.set_ylim(0, self._size[1])
         ax.set_xticks([])
         ax.set_yticks([])
         return ax
@@ -205,7 +205,7 @@ class Preset(object):
     def plot_2d_event(self, ax, obj=None, i=None, **kwargs):
         if i is None:
             obj = ax.imshow(
-                np.zeros(self._size), 
+                np.zeros(self._size[::-1]), 
                 vmin=-1, vmax=1,
                 cmap=self._ev_cmap
             )        
@@ -213,17 +213,17 @@ class Preset(object):
 
         events = self._packets[i].events()
         if not events.isEmpty():
-            image = _visualize_events(events, self._size)
+            image = _visualize_events(events, self._size[::-1])
             obj.set_data(np.flip(image, axis=0))
         else:
-            obj.set_data(np.zeros(self._size))
+            obj.set_data(np.zeros(self._size[::-1]))
 
         return obj
 
     def plot_2d_frame(self, ax, obj=None, i=None, **kwargs):
         if i is None:
             obj = ax.imshow(
-                np.zeros(self._size),
+                np.zeros(self._size[::-1]),
                 vmin=0, vmax=255,
                 cmap=self._fr_cmap
             )
@@ -239,9 +239,9 @@ class Preset(object):
     # ---------------- 3d settings ----------------
     def set_3d_plot(self, ax, **kwargs):
         ax.set_ylim3d(0, self._size[0])
-        ax.set_zlim3d(0, self._size[1])
+        ax.set_zlim3d(self._size[1], 0)
         ax.set_box_aspect((500, self._size[0], self._size[1]))
-        ax.view_init(elev=35, azim=-10, roll=-95)
+        ax.view_init(elev=45, azim=30, roll=0)
         return ax
     
     def plot_3d_event(self, ax, obj=None, i=None, **kwargs):
@@ -251,7 +251,7 @@ class Preset(object):
 
         events = self._packets[i].events()
         if not events.isEmpty():
-            obj._offsets3d = (events.timestamps(), events.ys(), events.xs())
+            obj._offsets3d = (events.timestamps(), events.xs(), events.ys())
             obj.set_array(events.polarities())
             ax.set_xlim3d(events.getLowestTime(), events.getHighestTime())
             ax.set_xticks(np.linspace(events.getLowestTime(), events.getHighestTime(), 5))
@@ -272,7 +272,7 @@ class Preset(object):
         if not frames.isEmpty():
             obj.remove()
             for frame in frames:
-                image = _convert_to_rgba(frame.image) / 255.0
+                image = np.fliplr(np.rot90(_convert_to_rgba(frame.image) / 255.0, -1))
                 obj = ax.plot_surface(frame.timestamp, xx, yy, facecolors=image)
 
         return obj

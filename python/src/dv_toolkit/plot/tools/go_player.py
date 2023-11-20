@@ -120,7 +120,7 @@ class Preset(object):
         """
         Create a Figure() class with default settings
         """
-        self._size = size[::-1]
+        self._size = size
         self._packets = packets
         self._ticks = range(len(packets))
 
@@ -132,8 +132,8 @@ class Preset(object):
     # ---------------- 2d settings ----------------
     def set_2d_plot(self, **kwargs):
         return {
-            "xaxis": dict(range=[0, self._size[1]]),
-            "yaxis": dict(range=[0, self._size[0]],
+            "xaxis": dict(range=[0, self._size[0]]),
+            "yaxis": dict(range=[0, self._size[1]],
                           scaleanchor="x",
                           scaleratio=1.),
         }
@@ -150,13 +150,13 @@ class Preset(object):
 
         events = self._packets[i].events()
         if not events.isEmpty():
-            image = _visualize_events(events, self._size)
+            image = _visualize_events(events, self._size[::-1])
             obj = go.Heatmap(
                 z=np.flip(image, axis=0),
             )
         else:
             obj = go.Heatmap(
-                z=np.zeros(self._size),
+                z=np.zeros(self._size[::-1]),
             )            
 
         return obj
@@ -184,10 +184,9 @@ class Preset(object):
     # ---------------- 3d settings ----------------
     def set_3d_plot(self, **kwargs):
         return {
-            "scene": dict(xaxis=dict(range=[0, self._size[0]]),
-                          yaxis=dict(range=[0, self._size[1]]),
-                          aspectratio=dict(x=self._size[0]/500, y=self._size[1]/500, z=1.),
-                          camera=dict(up=dict(x=1.0, y=0.0, z=0.0))),
+            "scene": dict(yaxis=dict(range=[0, self._size[0]]),
+                          zaxis=dict(range=[self._size[1], 0]),
+                          aspectratio=dict(x=1., y=self._size[0]/500, z=self._size[1]/500)),
         }
 
     def plot_3d_event(self, obj=None, i=None, **kwargs):
@@ -208,9 +207,9 @@ class Preset(object):
         events = self._packets[i].events()
         if not events.isEmpty():
             obj = go.Scatter3d(
-                x=self._size[0]-events.ys()-1, y=self._size[1]-events.xs()-1, 
-                z=[f"{datetime.fromtimestamp(ts * 1E-6).strftime('%H:%M:%S.%f')}"
+                x=[f"{datetime.fromtimestamp(ts * 1E-6).strftime('%H:%M:%S.%f')}"
                    for ts in events.timestamps()],
+                y=events.xs(), z=events.ys(), 
                 marker=dict(color=events.polarities()),
             )
         else:
@@ -223,7 +222,7 @@ class Preset(object):
         if i is None:
             obj = go.Surface(
                 x=[], y=[], z=[],
-                surfacecolor=np.ones((1000, 1000)),
+                surfacecolor=np.full((*self._size, 1), np.nan),
                 colorscale=self._fr_cmap,
                 cmin=0,
                 cmax=255,
@@ -237,10 +236,9 @@ class Preset(object):
             for frame in frames:
                 xx, yy = np.mgrid[0:self._size[0], 0:self._size[1]]
                 obj = go.Surface(
-                    x=xx,
-                    y=yy,
-                    z=np.full(self._size, datetime.fromtimestamp(frame.timestamp * 1E-6).strftime('%H:%M:%S.%f')),
-                    surfacecolor=np.flipud(np.fliplr(frame.image))
+                    x=np.full(self._size, datetime.fromtimestamp(frame.timestamp * 1E-6).strftime('%H:%M:%S.%f')),
+                    y=xx, z=yy,
+                    surfacecolor=np.fliplr(np.rot90(frame.image, -1))
                 )
 
         return obj
