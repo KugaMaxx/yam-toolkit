@@ -62,7 +62,8 @@ their usage as much as possible.
     print(data.triggers())
 
     # Get camera resolution
-    print(reader.getResolution())
+    # Can also use reader.getEventResolution()
+    print(reader.getResolution("events"))
     ```
 
 + `MonoCameraWriter()` write offline data to aedat4 file.
@@ -135,7 +136,8 @@ core between matplotlib and plotly.
     data = reader.loadData()
 
     # Get data resolution
-    resolution = reader.getResolution()
+    # Can also use reader.getEventResolution()
+    resolution = reader.getResolution("events")
 
     # Send MonoCameraData to player, modes include:
     # hybrid, 3d, 2d

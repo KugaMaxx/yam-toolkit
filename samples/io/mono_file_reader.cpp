@@ -16,7 +16,8 @@ int main() {
     std::cout << data.triggers() << std::endl;
 
     // Get camera resolution
-    const auto resolution = reader.getResolution();
+    // Can also use reader.getEventResolution()
+    const auto resolution = reader.getResolution("events");
     if (resolution.has_value()) {
         std::cout << *resolution << std::endl;
     }

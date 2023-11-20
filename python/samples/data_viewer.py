@@ -8,7 +8,8 @@ reader = kit.io.MonoCameraReader("/path/to/aedat4")
 data = reader.loadData()
 
 # Get data resolution
-resolution = reader.getResolution()
+# Can also use reader.getEventResolution()
+resolution = reader.getResolution("events")
 
 # Send MonoCameraData to player, modes include:
 # hybrid, 3d, 2d

@@ -13,4 +13,5 @@ print(data.imus())
 print(data.triggers())
 
 # Get camera resolution
-print(reader.getResolution())
+# Can also use reader.getEventResolution()
+print(reader.getResolution("events"))
