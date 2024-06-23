@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 # Project name and version.
 project(
     dv-toolkit
-    VERSION 0.1.0
+    VERSION 0.1.1
     LANGUAGES C CXX)
 
 # List of available options
@@ -18,6 +18,11 @@ message(STATUS "TOOLKIT_ENABLE_PYTHON ${TOOLKIT_ENABLE_PYTHON}")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Find compression support
+INCLUDE(FindPkgConfig)
+PKG_CHECK_MODULES(liblz4 IMPORTED_TARGET liblz4)
+PKG_CHECK_MODULES(libzstd IMPORTED_TARGET libzstd)
 
 # Find dv-processing support.
 find_package(dv-processing REQUIRED)

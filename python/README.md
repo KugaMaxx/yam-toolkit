@@ -27,10 +27,10 @@ their usage as much as possible.
     # Emplace back event elements, the function arguments are:
     # timestamp, x, y, polarity
     store = kit.EventStorage()
-    store.emplace_back(dv::now(), 0, 0, false)
-    store.emplace_back(dv::now(), 1, 1, true)
-    store.emplace_back(dv::now(), 2, 2, false)
-    store.emplace_back(dv::now(), 3, 3, true)
+    store.emplace_back(dv.now(), 0, 0, False)
+    store.emplace_back(dv.now(), 1, 1, True)
+    store.emplace_back(dv.now(), 2, 2, False)
+    store.emplace_back(dv.now(), 3, 3, True)
 
     # Assignment value to MonoCameraData
     data["events"] = store;

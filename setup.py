@@ -187,7 +187,7 @@ verify_and_configure_compiler()
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="dv_toolkit",
-    version="0.1.0",
+    version="0.1.1",
     author="Kuga Maxx",
     author_email="KugaMaxx@outlook.com",
     description="a generic and simple toolkit for processing event-based data",
