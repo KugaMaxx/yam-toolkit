@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 # Project name and version.
 project(
     dv-toolkit
-    VERSION 0.1.1
+    VERSION 0.1.2
     LANGUAGES C CXX)
 
 # List of available options

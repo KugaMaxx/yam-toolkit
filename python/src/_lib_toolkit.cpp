@@ -10,6 +10,7 @@
 
 #include <dv-toolkit/toolkit.hpp>
 #include <dv-processing/processing.hpp>
+#include "../external/pybind11_opencv_numpy/ndarray_converter.h"
 
 namespace py  = pybind11;
 namespace kit = dv::toolkit;
@@ -45,6 +46,8 @@ struct type_caster<cv::Size> {
 
 PYBIND11_MODULE(_lib_toolkit, m) {
 	using pybind11::operator""_a;
+
+	NDArrayConverter::init_numpy();
 
 	py::class_<std::filesystem::path>(m, "Path")
 		.def(py::init<std::string>(), "path"_a);
@@ -264,7 +267,15 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("retainDuration", &kit::FrameStorage::retainDuration, "duration"_a)
 		.def("duration", &kit::FrameStorage::duration)
 		.def("timeWindow", &kit::FrameStorage::timeWindow)
-		.def("rate", &kit::FrameStorage::rate);
+		.def("rate", &kit::FrameStorage::rate)
+        .def("push_back",
+			[](kit::FrameStorage &self, const int64_t timestamp, const cv::Mat &image) {
+				return self.emplace_back(timestamp, image);
+			}, "timestamp"_a, "image"_a)
+		.def("emplace_back",
+			[](kit::FrameStorage &self, const int64_t timestamp, const cv::Mat &image) {
+				return self.emplace_back(timestamp, image);
+			}, "timestamp"_a, "image"_a);
 
     py::class_<kit::IMUStorage>(m, "IMUStorage")
         .def(py::init<>())

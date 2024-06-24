@@ -2,3 +2,6 @@
 	path = python/external/pybind11
 	url = ../../pybind/pybind11
 	branch = stable
+[submodule "python/external/pybind11_opencv_numpy"]
+	path = python/external/pybind11_opencv_numpy
+	url = https://github.com/edmBernard/pybind11_opencv_numpy.git

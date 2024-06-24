@@ -189,19 +189,35 @@ public:
 	}
 
 	void _unsafe_add(const Type &element) {
-		highestTime_ = element.timestamp();
-		if (length_ == 0) {
-			lowestTime_ = element.timestamp();
+		if constexpr (dv::concepts::TimestampedByAccessor<Type>) {
+			highestTime_ = element.timestamp();
+			if (length_ == 0) {
+				lowestTime_ = element.timestamp();
+			}
+		} else {
+			highestTime_ = element.timestamp;
+			if (length_ == 0) {
+				lowestTime_ = element.timestamp;
+			}
 		}
+		
 		modifiableDataPtr_->elements.emplace_back(element);
 		length_++;
 	}
 
 	void _unsafe_move(Type &&element) {
-		highestTime_ = element.timestamp();
-		if (length_ == 0) {
-			lowestTime_ = element.timestamp();
+		if constexpr (dv::concepts::TimestampedByAccessor<Type>) {
+			highestTime_ = element.timestamp();
+			if (length_ == 0) {
+				lowestTime_ = element.timestamp();
+			}
+		} else {
+			highestTime_ = element.timestamp;
+			if (length_ == 0) {
+				lowestTime_ = element.timestamp;
+			}
 		}
+
 		// this should cause a move action instead of a copy
 		modifiableDataPtr_->elements.push_back(std::move(element));
 		length_++;
@@ -667,8 +683,14 @@ public:
 	}
 
 	void push_back(const Type &element) {
-		if (getHighestTime() > element.timestamp()) {
-			throw std::out_of_range{"Tried adding element to store out of order."};
+		if constexpr (dv::concepts::TimestampedByAccessor<Type>) {
+			if (getHighestTime() > element.timestamp()) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
+		} else {
+			if (getHighestTime() > element.timestamp) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
 		}
 
 		_getLastNonFullPartial()._unsafe_add(element);
@@ -676,8 +698,14 @@ public:
 	}
 
 	void push_back(Type &&element) {
-		if (getHighestTime() > element.timestamp()) {
-			throw std::out_of_range{"Tried adding element to store out of order."};
+		if constexpr (dv::concepts::TimestampedByAccessor<Type>) {
+			if (getHighestTime() > element.timestamp()) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
+		} else {
+			if (getHighestTime() > element.timestamp) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
 		}
 
 		_getLastNonFullPartial()._unsafe_move(std::move(element));
@@ -688,8 +716,14 @@ public:
 	Type &emplace_back(Args &&...args) {
 		Type element(std::forward<Args>(args)...);
 
-		if (getHighestTime() > element.timestamp()) {
-			throw std::out_of_range{"Tried adding element to store out of order."};
+		if constexpr (dv::concepts::TimestampedByAccessor<Type>) {
+			if (getHighestTime() > element.timestamp()) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
+		} else {
+			if (getHighestTime() > element.timestamp) {
+				throw std::out_of_range{"Tried adding element to store out of order."};
+			}
 		}
 
 		// This shouldn't cause any copy operations
