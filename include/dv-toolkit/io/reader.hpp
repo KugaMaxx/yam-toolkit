@@ -29,7 +29,7 @@ private:
         while (frameReader.isRunning()) {
             if (frameReader.isFrameStreamAvailable()) {
                 if (const auto frame = frameReader.getNextFrame(); frame.has_value()) {
-                    const auto packet = kit::FramePacket(dv::cvector<dv::Frame>{*frame});
+                    const auto packet = kit::FramePacket(std::vector<dv::Frame>{*frame});
                     data.add("frames", kit::FrameStorage(packet));
                 }
             }

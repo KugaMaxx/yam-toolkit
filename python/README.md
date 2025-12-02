@@ -38,8 +38,6 @@ their usage as much as possible.
     # Access mutable variables through __getitem__
     print(data["events"])
     # "Storage containing 4 elements within ..."
-
-    return 0;
     ```
 
 ### I/O Operations

@@ -278,11 +278,6 @@ unified slicing of various types of data by using dv-toolkit library.
     }
     ```
 
-### TODO List
-
-- [ ] Add hot pixel removal
-- [ ] Add shot noise generator
-
 ## Acknowledgement
 
 Special thanks to [Jinze Chen](mailto:chjz@mail.ustc.edu.cn).

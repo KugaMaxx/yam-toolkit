@@ -13,7 +13,6 @@
 #include <dv-processing/core/dvassert.hpp>
 #include <dv-processing/core/time.hpp>
 #include <dv-processing/core/time_window.hpp>
-#include <dv-processing/data/cvector.hpp>
 
 namespace dv::toolkit {
 
@@ -25,12 +24,12 @@ namespace dv::toolkit {
 template<class Type> // requires dv::Event || dv::Frame || dv::IMU
 struct Packet : public flatbuffers::NativeTable {
 public:
-	dv::cvector<Type> elements;
+	std::vector<Type> elements;
 
 	Packet() {
     }
 
-	Packet(const dv::cvector<Type> &_elements) : elements{_elements} {
+	Packet(const std::vector<Type> &_elements) : elements{_elements} {
 	}
 	
 	friend std::ostream &operator<<(std::ostream &os, const Packet &packet) {
@@ -89,7 +88,7 @@ public:
  */
 template<typename Type, class PacketType>
 class PartialData {
-    using iterator = typename dv::cvector<const Type>::iterator;
+    using iterator = typename std::vector<Type>::const_iterator;
     
 private:
 	bool referencesConstData_;
@@ -244,7 +243,7 @@ public:
 	}
 
 	[[nodiscard]] inline const Type &operator[](size_t offset) const {
-		dv::runtime_assert(offset <= length_, "offset out of bounds");
+		dv::runtime_assert([&] { return offset <= length_; }, [] { return "offset out of bounds"; });
 		return (data_->elements)[start_ + offset];
 	}
 
@@ -908,7 +907,7 @@ public:
 	}
 
 	[[nodiscard]] const Type &operator[](const size_t index) const {
-		dv::runtime_assert(index < totalLength_, "Index exceeds Store range");
+		dv::runtime_assert([&] { return index < totalLength_; }, [] { return "Index exceeds Store range"; });
 
 		const auto lowerPartial = std::upper_bound(partialOffsets_.begin(), partialOffsets_.end(), index);
 		const auto lowIndex     = static_cast<size_t>(std::distance(partialOffsets_.begin(), lowerPartial) - 1);
@@ -917,7 +916,7 @@ public:
 	}
 
 	[[nodiscard]] const Type &at(const size_t index) const {
-		dv::runtime_assert(index < totalLength_, "Index exceeds Store range");
+		dv::runtime_assert([&] { return index < totalLength_; }, [] { return "Index exceeds Store range"; });
 
 		const auto lowerPartial = std::upper_bound(partialOffsets_.begin(), partialOffsets_.end(), index);
 		const auto lowIndex     = static_cast<size_t>(std::distance(partialOffsets_.begin(), lowerPartial) - 1);

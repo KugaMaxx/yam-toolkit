@@ -62,7 +62,7 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 
 	py::class_<kit::EventPacket>(m, "EventPacket")
 		.def(py::init<>())
-		.def(py::init<const dv::cvector<dv::Event> &>(), "events"_a)
+		.def(py::init<const std::vector<dv::Event> &>(), "events"_a)
 		.def_readwrite("elements", &kit::EventPacket::elements)
 		.def("__array__",
 			 [](const kit::EventPacket &self) {
@@ -94,7 +94,7 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 	
 	py::class_<kit::FramePacket>(m, "FramePacket")
 		.def(py::init<>())
-		.def(py::init<const dv::cvector<dv::Frame> &>(), "frames"_a)
+		.def(py::init<const std::vector<dv::Frame> &>(), "frames"_a)
 		.def_readwrite("elements", &kit::FramePacket::elements)
 		.def("__repr__",
 			[](const kit::FramePacket &self) {
@@ -106,7 +106,7 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 
 	py::class_<kit::IMUPacket>(m, "IMUPacket")
 		.def(py::init<>())
-		.def(py::init<const dv::cvector<dv::IMU> &>(), "imus"_a)
+		.def(py::init<const std::vector<dv::IMU> &>(), "imus"_a)
 		.def_readwrite("elements", &kit::IMUPacket::elements)
 		.def("__repr__",
 			[](const kit::IMUPacket &self) {
@@ -118,7 +118,7 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 
 	py::class_<kit::TriggerPacket>(m, "TriggerPacket")
 		.def(py::init<>())
-		.def(py::init<const dv::cvector<dv::Trigger> &>(), "triggers"_a)
+		.def(py::init<const std::vector<dv::Trigger> &>(), "triggers"_a)
 		.def_readwrite("elements", &kit::TriggerPacket::elements)
 		.def("__repr__",
 			[](const kit::TriggerPacket &self) {
