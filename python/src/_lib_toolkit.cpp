@@ -217,7 +217,21 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("ys", &kit::EventStorage::ys)
 		.def("coordinates", &kit::EventStorage::coordinates)
 		.def("polarities", &kit::EventStorage::polarities)
-		.def("toEventStore", &kit::EventStorage::toEventStore);
+		.def("toEventStore", [](const kit::EventStorage &self) -> py::object {
+			// Import dv-processing module to get the registered EventStore type
+			py::module_ dv_module = py::module_::import("dv_processing");
+			py::object EventStore = dv_module.attr("EventStore");
+			
+			// Populate the store with events
+			py::object store = EventStore();
+			for (const auto &event : self) {
+				store.attr("push_back")(py::make_tuple(
+					event.timestamp(), event.x(), event.y(), event.polarity()
+				));
+			}
+			
+			return store;
+		});
 
     py::class_<kit::FrameStorage>(m, "FrameStorage")
         .def(py::init<>())
