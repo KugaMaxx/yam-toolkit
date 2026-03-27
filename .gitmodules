@@ -5,3 +5,6 @@
 [submodule "python/external/pybind11_opencv_numpy"]
 	path = python/external/pybind11_opencv_numpy
 	url = https://github.com/edmBernard/pybind11_opencv_numpy.git
+[submodule "python/external/dv-processing"]
+	path = python/external/dv-processing
+	url = https://gitlab.com/inivation/dv/dv-processing.git

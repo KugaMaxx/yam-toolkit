@@ -9,15 +9,20 @@ project(
 # List of available options
 option(TOOLKIT_ENABLE_SAMPLES "Build samples" OFF)
 option(TOOLKIT_ENABLE_PYTHON "Build python bindings" OFF)
+option(TOOLKIT_ENABLE_FIND_PROCESSING "Find installed dv-processing instead of bundled source" OFF)
 
 # Print basic options info
 message(STATUS "TOOLKIT_ENABLE_SAMPLES ${TOOLKIT_ENABLE_SAMPLES}")
 message(STATUS "TOOLKIT_ENABLE_PYTHON ${TOOLKIT_ENABLE_PYTHON}")
+message(STATUS "TOOLKIT_ENABLE_FIND_PROCESSING ${TOOLKIT_ENABLE_FIND_PROCESSING}")
 
 # C++ standard settings.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Find Eigen support
+FIND_PACKAGE(Eigen3 REQUIRED)
 
 # Find compression support
 INCLUDE(FindPkgConfig)
@@ -25,7 +30,11 @@ PKG_CHECK_MODULES(liblz4 IMPORTED_TARGET liblz4)
 PKG_CHECK_MODULES(libzstd IMPORTED_TARGET libzstd)
 
 # Find dv-processing support.
-find_package(dv-processing REQUIRED)
+if(TOOLKIT_ENABLE_FIND_PROCESSING)
+    find_package(dv-processing REQUIRED)
+else()
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/python/external/dv-processing EXCLUDE_FROM_ALL)
+endif()
 
 # Install header files.
 add_subdirectory(include)
