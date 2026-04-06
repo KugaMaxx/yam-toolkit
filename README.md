@@ -40,7 +40,7 @@ Since our library is an extension of dv-processing, you need to install dv-proce
     ```bash
     sudo add-apt-repository ppa:inivation-ppa/inivation
     sudo apt-get update
-    sudo apt-get install libcaer-dev libfmt-dev liblz4-dev libzstd-dev libssl-dev
+    sudo apt-get install libcaer-dev libfmt-dev liblz4-dev libzstd-dev libssl-dev libusb-1.0-0-dev
     sudo apt-get install dv-processing
     ```
 
@@ -103,21 +103,6 @@ named `toolkit`. Please refer to the [README](https://github.com/KugaMaxx/yam-to
     # introduce extension
     import dv_toolkit as kit
     ```
-
-<!-- ### Include as C++ library
-
-+ Compile this project with CMake, including build
-
-```bash
-# create folder
-mkdir build && cd build
-
-# compile with samples
-CC=gcc-10 CXX=g++-10 cmake .. -DENABLE_SAMPLES=ON
-
-# generate library
-cmake --build . --config Release
-``` -->
 
 ## Getting started
 

@@ -15,6 +15,47 @@
 namespace py  = pybind11;
 namespace kit = dv::toolkit;
 
+// Convert C++ types to dv-processing Python objects
+static py::object warpEvent(const dv::Event &event) {
+	try {
+		auto dv_processing = py::module_::import("dv_processing");
+		auto Event = dv_processing.attr("Event");
+		return Event(event.timestamp(), event.x(), event.y(), event.polarity());
+	} catch (const std::exception &e) {
+		throw std::runtime_error(std::string("Failed to convert Event: ") + e.what());
+	}
+}
+
+static py::object warpFrame(const dv::Frame &frame) {
+	try {
+		auto dv_processing = py::module_::import("dv_processing");
+		auto Frame = dv_processing.attr("Frame");
+		return Frame(frame.timestamp, frame.image);
+	} catch (const std::exception &e) {
+		throw std::runtime_error(std::string("Failed to convert Frame: ") + e.what());
+	}
+}
+
+static py::object warpIMU(const dv::IMU &imu) {
+	try {
+		auto dv_processing = py::module_::import("dv_processing");
+		auto IMU = dv_processing.attr("IMU");
+		return IMU(imu);
+	} catch (const std::exception &e) {
+		throw std::runtime_error(std::string("Failed to convert IMU: ") + e.what());
+	}
+}
+
+static py::object warpTrigger(const dv::Trigger &trigger) {
+	try {
+		auto dv_processing = py::module_::import("dv_processing");
+		auto Trigger = dv_processing.attr("Trigger");
+		return Trigger(trigger);
+	} catch (const std::exception &e) {
+		throw std::runtime_error(std::string("Failed to convert Trigger: ") + e.what());
+	}
+}
+
 namespace pybind11::detail {
 
 template<>
@@ -164,11 +205,18 @@ PYBIND11_MODULE(_lib_toolkit, m) {
                 return ss.str();
             })
 		.def("__len__", &kit::EventStorage::size)
-		.def("__getitem__", &kit::EventStorage::at)
+		.def("__getitem__", 
+			[](const kit::EventStorage &self, size_t index) {
+				return warpEvent(self.at(index));
+			})
         .def("__iter__",
 			[](const kit::EventStorage &self) {
-				return py::make_iterator(self.begin(), self.end());
-			}, py::keep_alive<0, 1>())
+				py::list items;
+				for (const auto &event : self) {
+					items.append(warpEvent(event));
+				}
+				return items.attr("__iter__")();
+			})
         .def("add",
 			[](kit::EventStorage &self, const kit::EventStorage &other) {
 				return self.add(other);
@@ -194,23 +242,32 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("size", &kit::EventStorage::size)
 		.def("getLowestTime", &kit::EventStorage::getLowestTime)
 		.def("getHighestTime", &kit::EventStorage::getHighestTime)
-		.def("at", &kit::EventStorage::at, "index"_a)
+		.def("at", 
+			[](const kit::EventStorage &self, size_t index) {
+				return warpEvent(self.at(index));
+			}, "index"_a)
 		.def("isEmpty", &kit::EventStorage::isEmpty)
 		.def("erase", &kit::EventStorage::erase, "start"_a, "length"_a)
 		.def("eraseTime", &kit::EventStorage::eraseTime, "startTime"_a, "endTime"_a)
-		.def("front", &kit::EventStorage::front)
-		.def("back", &kit::EventStorage::back)
+		.def("front", 
+			[](const kit::EventStorage &self) {
+				return warpEvent(self.front());
+			})
+		.def("back", 
+			[](const kit::EventStorage &self) {
+				return warpEvent(self.back());
+			})
 		.def("retainDuration", &kit::EventStorage::retainDuration, "duration"_a)
 		.def("duration", &kit::EventStorage::duration)
 		.def("timeWindow", &kit::EventStorage::timeWindow)
 		.def("rate", &kit::EventStorage::rate)
         .def("push_back",
 			[](kit::EventStorage &self, const int64_t timestamp, const int16_t x, const int16_t y, const bool polarity) {
-				return self.emplace_back(timestamp, x, y, polarity);
+				self.emplace_back(timestamp, x, y, polarity);
 			}, "timestamp"_a, "x"_a, "y"_a, "polarity"_a)
 		.def("emplace_back",
 			[](kit::EventStorage &self, const int64_t timestamp, const int16_t x, const int16_t y, const bool polarity) {
-				return self.emplace_back(timestamp, x, y, polarity);
+				self.emplace_back(timestamp, x, y, polarity);
 			}, "timestamp"_a, "x"_a, "y"_a, "polarity"_a)
 		.def("timestamps", &kit::EventStorage::timestamps)
 		.def("xs", &kit::EventStorage::xs)
@@ -243,11 +300,18 @@ PYBIND11_MODULE(_lib_toolkit, m) {
                 return ss.str();
             })
 		.def("__len__", &kit::FrameStorage::size)
-		.def("__getitem__", &kit::FrameStorage::at)
+		.def("__getitem__", 
+			[](const kit::FrameStorage &self, size_t index) {
+				return warpFrame(self.at(index));
+			})
         .def("__iter__",
 			[](const kit::FrameStorage &self) {
-				return py::make_iterator(self.begin(), self.end());
-			}, py::keep_alive<0, 1>())
+				py::list items;
+				for (const auto &frame : self) {
+					items.append(warpFrame(frame));
+				}
+				return items.attr("__iter__")();
+			})
         .def("add",
 			[](kit::FrameStorage &self, const kit::FrameStorage &other) {
 				return self.add(other);
@@ -272,23 +336,32 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("size", &kit::FrameStorage::size)
 		.def("getLowestTime", &kit::FrameStorage::getLowestTime)
 		.def("getHighestTime", &kit::FrameStorage::getHighestTime)
-		.def("at", &kit::FrameStorage::at, "index"_a)
+		.def("at", 
+			[](const kit::FrameStorage &self, size_t index) {
+				return warpFrame(self.at(index));
+			}, "index"_a)
 		.def("isEmpty", &kit::FrameStorage::isEmpty)
 		.def("erase", &kit::FrameStorage::erase, "start"_a, "length"_a)
 		.def("eraseTime", &kit::FrameStorage::eraseTime, "startTime"_a, "endTime"_a)
-		.def("front", &kit::FrameStorage::front)
-		.def("back", &kit::FrameStorage::back)
+		.def("front", 
+			[](const kit::FrameStorage &self) {
+				return warpFrame(self.front());
+			})
+		.def("back", 
+			[](const kit::FrameStorage &self) {
+				return warpFrame(self.back());
+			})
 		.def("retainDuration", &kit::FrameStorage::retainDuration, "duration"_a)
 		.def("duration", &kit::FrameStorage::duration)
 		.def("timeWindow", &kit::FrameStorage::timeWindow)
 		.def("rate", &kit::FrameStorage::rate)
         .def("push_back",
 			[](kit::FrameStorage &self, const int64_t timestamp, const cv::Mat &image) {
-				return self.emplace_back(timestamp, image);
+				self.emplace_back(timestamp, image);
 			}, "timestamp"_a, "image"_a)
 		.def("emplace_back",
 			[](kit::FrameStorage &self, const int64_t timestamp, const cv::Mat &image) {
-				return self.emplace_back(timestamp, image);
+				self.emplace_back(timestamp, image);
 			}, "timestamp"_a, "image"_a);
 
     py::class_<kit::IMUStorage>(m, "IMUStorage")
@@ -301,11 +374,18 @@ PYBIND11_MODULE(_lib_toolkit, m) {
                 return ss.str();
             })
 		.def("__len__", &kit::IMUStorage::size)
-		.def("__getitem__", &kit::IMUStorage::at)
+		.def("__getitem__", 
+			[](const kit::IMUStorage &self, size_t index) {
+				return warpIMU(self.at(index));
+			})
         .def("__iter__",
 			[](const kit::IMUStorage &self) {
-				return py::make_iterator(self.begin(), self.end());
-			}, py::keep_alive<0, 1>())
+				py::list items;
+				for (const auto &imu : self) {
+					items.append(warpIMU(imu));
+				}
+				return items.attr("__iter__")();
+			})
         .def("add",
 			[](kit::IMUStorage &self, const kit::IMUStorage &other) {
 				return self.add(other);
@@ -330,12 +410,21 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("size", &kit::IMUStorage::size)
 		.def("getLowestTime", &kit::IMUStorage::getLowestTime)
 		.def("getHighestTime", &kit::IMUStorage::getHighestTime)
-		.def("at", &kit::IMUStorage::at, "index"_a)
+		.def("at", 
+			[](const kit::IMUStorage &self, size_t index) {
+				return warpIMU(self.at(index));
+			}, "index"_a)
 		.def("isEmpty", &kit::IMUStorage::isEmpty)
 		.def("erase", &kit::IMUStorage::erase, "start"_a, "length"_a)
 		.def("eraseTime", &kit::IMUStorage::eraseTime, "startTime"_a, "endTime"_a)
-		.def("front", &kit::IMUStorage::front)
-		.def("back", &kit::IMUStorage::back)
+		.def("front", 
+			[](const kit::IMUStorage &self) {
+				return warpIMU(self.front());
+			})
+		.def("back", 
+			[](const kit::IMUStorage &self) {
+				return warpIMU(self.back());
+			})
 		.def("retainDuration", &kit::IMUStorage::retainDuration, "duration"_a)
 		.def("duration", &kit::IMUStorage::duration)
 		.def("timeWindow", &kit::IMUStorage::timeWindow)
@@ -351,11 +440,18 @@ PYBIND11_MODULE(_lib_toolkit, m) {
                 return ss.str();
             })
 		.def("__len__", &kit::TriggerStorage::size)
-		.def("__getitem__", &kit::TriggerStorage::at)
+		.def("__getitem__", 
+			[](const kit::TriggerStorage &self, size_t index) {
+				return warpTrigger(self.at(index));
+			})
         .def("__iter__",
 			[](const kit::TriggerStorage &self) {
-				return py::make_iterator(self.begin(), self.end());
-			}, py::keep_alive<0, 1>())
+				py::list items;
+				for (const auto &trigger : self) {
+					items.append(warpTrigger(trigger));
+				}
+				return items.attr("__iter__")();
+			})
         .def("add",
 			[](kit::TriggerStorage &self, const kit::TriggerStorage &other) {
 				return self.add(other);
@@ -380,12 +476,21 @@ PYBIND11_MODULE(_lib_toolkit, m) {
 		.def("size", &kit::TriggerStorage::size)
 		.def("getLowestTime", &kit::TriggerStorage::getLowestTime)
 		.def("getHighestTime", &kit::TriggerStorage::getHighestTime)
-		.def("at", &kit::TriggerStorage::at, "index"_a)
+		.def("at", 
+			[](const kit::TriggerStorage &self, size_t index) {
+				return warpTrigger(self.at(index));
+			}, "index"_a)
 		.def("isEmpty", &kit::TriggerStorage::isEmpty)
 		.def("erase", &kit::TriggerStorage::erase, "start"_a, "length"_a)
 		.def("eraseTime", &kit::TriggerStorage::eraseTime, "startTime"_a, "endTime"_a)
-		.def("front", &kit::TriggerStorage::front)
-		.def("back", &kit::TriggerStorage::back)
+		.def("front", 
+			[](const kit::TriggerStorage &self) {
+				return warpTrigger(self.front());
+			})
+		.def("back", 
+			[](const kit::TriggerStorage &self) {
+				return warpTrigger(self.back());
+			})
 		.def("retainDuration", &kit::TriggerStorage::retainDuration, "duration"_a)
 		.def("duration", &kit::TriggerStorage::duration)
 		.def("timeWindow", &kit::TriggerStorage::timeWindow)

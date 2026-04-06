@@ -187,7 +187,7 @@ verify_and_configure_compiler()
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="dv_toolkit",
-    version="0.1.3",
+    version="0.2.0",
     author="Kuga Maxx",
     author_email="KugaMaxx@outlook.com",
     description="a generic and simple toolkit for processing event-based data",
@@ -200,7 +200,7 @@ setup(
     package_dir={'':'python/src'},
     install_requires=[
         'numpy>=1.24',
-        'dv_processing>=1.7',
+        'dv_processing>=2.0',
         'plotly>=5.17',
         'matplotlib>=3.7'
     ]
